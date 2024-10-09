@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
-from modules.library.models.requests import SignUpRequest, loginRequest, BookRequest
+from modules.library.models.requests import SignUpRequest, loginRequest, BookRequest, UpdateMemberRequest
 from modules.library.models.models import UserRoles
 from modules.library.service import LibraryService
 from functools import wraps
@@ -37,6 +37,9 @@ def login():
     login_request = loginRequest(**data)
 
     user = library_service.get_user_by_username(login_request.username)
+
+    if user.status == 'DELETED':
+        return jsonify({"error": "User does not exist"}), 400
 
     if not check_password_hash(user.password_hash, login_request.password):
         return jsonify({"error": "Invalid password"}), 400
@@ -76,7 +79,7 @@ def member_login_required(fn):
 # Librarian routes
 
 @library_bp.route('/books', methods=['GET'])
-@jwt_required()
+@librarian_login_required()
 def get_books():
     books = library_service.get_books()
     return jsonify(books), 200
@@ -91,3 +94,74 @@ def add_book():
     library_service.add_book(book_request)
 
     return jsonify({"message": "Book added successfully"}), 201
+
+@library_bp.route('/delete_book', methods=['DELETE'])
+@librarian_login_required
+def delete_book():
+    book_id = request.get_json().get('book_id')
+    if not book_id:
+        return jsonify({"error": "Book ID is required"}), 400
+    library_service.delete_book(book_id)
+    return jsonify({"message": "Book deleted successfully"}), 200
+
+@library_bp.route('/update_book', methods=['PUT'])
+@librarian_login_required
+def update_book():
+    data = request.get_json()
+    book_id = data.get('book_id')
+    if not book_id:
+        return jsonify({"error": "Book ID is required"}), 400
+    book_request = BookRequest(**data)
+    library_service.update_book(book_id, book_request)
+    return jsonify({"message": "Book updated successfully"}), 200
+
+@library_bp.route('/add_member', methods=['POST'])
+@librarian_login_required
+def add_member():
+    data = request.get_json()
+    user_request = SignUpRequest(**data)
+
+    if library_service.user_exists(user_request.username):
+        return jsonify({"error": "Username already exists"}), 400
+
+    user_request.role = UserRoles.MEMBER
+
+    library_service.create_user(user_request=user_request)
+
+    return jsonify({"message": "Member created successfully"}), 201
+
+#Soft Delete
+@library_bp.route('/delete_member', methods=['DELETE'])
+@librarian_login_required
+def delete_member():
+    member_id = request.get_json().get('member_id')
+    if not member_id:
+        return jsonify({"error": "Member ID is required"}), 400
+    library_service.delete_user(member_id)
+    return jsonify({"message": "Member deleted successfully"}), 200
+
+@library_bp.route('/update_member', methods=['PUT'])
+@librarian_login_required
+def update_member():
+    data = request.get_json()
+    member_id = data.get('member_id')
+    if not member_id:
+        return jsonify({"error": "Member ID is required"}), 400
+    user_request = (UpdateMemberRequest**data)
+    library_service.update_user(member_id, user_request)
+    return jsonify({"message": "Member updated successfully"}), 200
+
+@library_bp.route('/member_history', methods=['GET'])
+@librarian_login_required
+def member_history():
+    member_id = request.args.get('member_id')
+    if not member_id:
+        return jsonify({"error": "Member ID is required"}), 400
+    history = library_service.get_member_history(member_id)
+    return jsonify(history), 200
+
+@library_bp.route('/view_members', methods=['POST'])
+@librarian_login_required
+def view_members():
+    members = library_service.get_members()
+    return jsonify(members), 200
