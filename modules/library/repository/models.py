@@ -32,8 +32,8 @@ class BorrowedBook(db.Model):
     __tablename__ = 'borrowed_books'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
-    member_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     borrowed_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     return_date = db.Column(db.DateTime)
 
@@ -41,7 +41,7 @@ class MemberHistory(db.Model):
     __tablename__ = 'member_history'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    member_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
     action = db.Column(db.Enum('BORROWED', 'RETURNED'), nullable=False)
     action_date = db.Column(db.DateTime, default=datetime.now)
