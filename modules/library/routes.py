@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from datetime import datetime
-from modules.library.models.requests import SignUpRequest
+from datetime import datetime, timedelta
+from modules.library.models.requests import SignUpRequest, loginRequest, BookRequest
 from modules.library.models.models import UserRoles
 from modules.library.service import LibraryService
 from functools import wraps
@@ -11,6 +11,9 @@ from functools import wraps
 library_bp = Blueprint('library', __name__)
 
 library_service = LibraryService()
+
+# Set the expiration time for the token
+expires = timedelta(minutes=15)
 
 @library_bp.route('/signup', methods=['POST'])
 def signup():
@@ -27,15 +30,14 @@ def signup():
     return jsonify({"message": "User created successfully"}), 201
 
 @library_bp.route('/login', methods=['POST'])
-@jwt_required()
 def login():
     data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
 
-    user = library_service.get_user_by_username(username)
+    login_request = loginRequest(**data)
 
-    if not check_password_hash(user.password_hash, password):
+    user = library_service.get_user_by_username(login_request.username)
+
+    if not check_password_hash(user.password_hash, login_request.password):
         return jsonify({"error": "Invalid password"}), 400
 
     access_token = create_access_token(identity=user.id)
@@ -50,7 +52,7 @@ def librarian_login_required(fn):
         current_user_id = get_jwt_identity()  # Get user ID from the token
         current_user = library_service.get_user_by_id(current_user_id)
 
-        if not current_user or current_user.role != UserRoles.LIBRARIAN:
+        if not current_user or current_user.role != UserRoles.LIBRARIAN.value:
             return jsonify({"error": "Access forbidden: Librarian role required"}), 403
         
         return fn(*args, **kwargs)
@@ -64,8 +66,27 @@ def member_login_required(fn):
         current_user_id = get_jwt_identity()  # Get user ID from the token
         current_user =  library_service.get_user_by_id(current_user_id)
 
-        if not current_user or current_user.role != UserRoles.MEMBER:
+        if not current_user or current_user.role != UserRoles.MEMBER.value:
             return jsonify({"error": "Access forbidden: Member role required"}), 403
         
         return fn(*args, **kwargs)
     return decorator
+
+# Librarian routes
+
+@library_bp.route('/books', methods=['GET'])
+@jwt_required()
+def get_books():
+    books = library_service.get_books()
+    return jsonify(books), 200
+
+@library_bp.route('/add_book', methods=['POST'])
+@librarian_login_required
+def add_book():
+    data = request.get_json()
+    book_request = BookRequest(**data)
+
+    # Add book to the database
+    library_service.add_book(book_request)
+
+    return jsonify({"message": "Book added successfully"}), 201
