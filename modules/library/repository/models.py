@@ -5,7 +5,9 @@ class User(db.Model):
     __tablename__ = 'users'
     __bind_key__ = 'library'
 
-    id = db.Column(db.String(56), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    first_name = db.Column(db.String(255), nullable=False)
+    last_name = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.Enum('LIBRARIAN', 'MEMBER'), nullable=False)
@@ -38,7 +40,7 @@ class BorrowedBook(db.Model):
 class MemberHistory(db.Model):
     __tablename__ = 'member_history'
     __bind_key__ = 'library'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
