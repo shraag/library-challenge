@@ -10,7 +10,7 @@ class LibraryRepository:
     def create_user(self, user_request: SignUpRequest) -> None:
         new_user = User(username=user_request.username, 
                         password_hash=user_request.password, 
-                        role=user_request.role,
+                        role=user_request.role.value,
                         first_name=user_request.first_name, 
                         last_name=user_request.last_name)
         db.session.add(new_user)
