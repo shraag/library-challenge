@@ -6,6 +6,7 @@ from modules.library.models.requests import SignUpRequest, loginRequest, BookReq
 from modules.library.models.models import UserRoles
 from modules.library.service import LibraryService
 from functools import wraps
+from config import Config
 
 
 library_bp = Blueprint('library', __name__)
@@ -13,7 +14,7 @@ library_bp = Blueprint('library', __name__)
 library_service = LibraryService()
 
 # Set the expiration time for the token
-expires = timedelta(minutes=15)
+expires = timedelta(minutes=int(Config.JWT_EXPIRATION_MINUTES))
 
 @library_bp.route('/signup', methods=['POST'])
 def signup():
