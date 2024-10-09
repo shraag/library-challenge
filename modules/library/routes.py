@@ -40,7 +40,7 @@ def login():
     if not check_password_hash(user.password_hash, login_request.password):
         return jsonify({"error": "Invalid password"}), 400
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=user.id, expires_delta=expires)
 
     return jsonify({"access_token": access_token}), 200
 
