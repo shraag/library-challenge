@@ -24,3 +24,17 @@ def signup():
 
     return jsonify({"message": "User created successfully"}), 201
 
+@library_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    user = library_service.get_user_by_username(username)
+
+    if not check_password_hash(user.password_hash, password):
+        return jsonify({"error": "Invalid password"}), 400
+
+    access_token = create_access_token(identity=username)
+
+    return jsonify({"access_token": access_token}), 200
