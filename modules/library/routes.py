@@ -6,13 +6,11 @@ from modules.library.models.requests import SignUpRequest
 from modules.library.service import LibraryService
 
 
-auth_bp = Blueprint('auth', __name__)
-librarian_bp = Blueprint('librarian', __name__)
-member_bp = Blueprint('member', __name__)
+library_bp = Blueprint('library', __name__)
 
 library_service = LibraryService()
 
-@auth_bp.route('/signup', methods=['POST'])
+@library_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     user_request = SignUpRequest(**data)
