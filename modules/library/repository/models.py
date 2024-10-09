@@ -3,6 +3,8 @@ from datetime import datetime
 
 class User(db.Model):
     __tablename__ = 'users'
+    __bind_key__ = 'library'
+
     id = db.Column(db.String(56), primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -13,6 +15,8 @@ class User(db.Model):
 
 class Book(db.Model):
     __tablename__ = 'books'
+    __bind_key__ = 'library'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255), nullable=True)
@@ -23,6 +27,8 @@ class Book(db.Model):
 
 class BorrowedBook(db.Model):
     __tablename__ = 'borrowed_books'
+    __bind_key__ = 'library'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -31,6 +37,8 @@ class BorrowedBook(db.Model):
 
 class MemberHistory(db.Model):
     __tablename__ = 'member_history'
+    __bind_key__ = 'library'
+    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
