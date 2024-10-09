@@ -25,6 +25,9 @@ class Book(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
 class BorrowedBook(db.Model):
     __tablename__ = 'borrowed_books'
 
