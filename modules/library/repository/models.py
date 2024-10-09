@@ -14,6 +14,15 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "username": self.username,
+            "status": self.status
+        }
+
 class Book(db.Model):
     __tablename__ = 'books'
 
@@ -45,3 +54,6 @@ class MemberHistory(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
     action = db.Column(db.Enum('BORROWED', 'RETURNED'), nullable=False)
     action_date = db.Column(db.DateTime, default=datetime.now)
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}

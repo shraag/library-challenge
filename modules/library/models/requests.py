@@ -32,4 +32,8 @@ class BookRequest(BaseModel):
     author: str
     published_year: str
 
+class UpdateMemberRequest(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    username: Optional[str]
     
