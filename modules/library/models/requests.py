@@ -21,5 +21,15 @@ class SignUpRequest(BaseModel):
     @validator('password', always=True)
     def hash_password(cls, v):
         return generate_password_hash(v)
+    
+
+class loginRequest(BaseModel):
+    username: str
+    password: str
+
+class BookRequest(BaseModel):
+    title: str
+    author: str
+    published_year: str
 
     
