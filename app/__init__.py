@@ -7,14 +7,13 @@ from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
+# Load configurations
+app.config.from_object(Config)
+
 # Initialize extensions
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)  # Initialize JWTManager
-
-# Load configuration from config.py
-app.config.from_object(Config)
-
 
 # Default route
 @app.route('/')
