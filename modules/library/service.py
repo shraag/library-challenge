@@ -43,3 +43,15 @@ class LibraryService:
     
     def get_members(self) -> List[Dict]:
         return library_repository.get_members()
+    
+    def get_available_books(self) -> List[Dict]:
+        return library_repository.get_available_books()
+    
+    def borrow_book(self, book_id: str, member_id: str) -> None:
+        library_repository.borrow_book(book_id, member_id)
+
+    def return_book(self, book_id: str, member_id: str) -> None:
+        library_repository.return_book(book_id, member_id)
+
+    def get_borrowed_books(self, member_id: str) -> List[Dict]:
+        return library_repository.get_borrowed_books(member_id)
