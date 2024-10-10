@@ -207,7 +207,7 @@ def delete_account():
     # Logout the user
     return jsonify({"message": "Account deleted successfully"}), 200
 
-@member_bp.route('/books_borrowed', methods=['get'])
+@member_bp.route('/books_borrowed', methods=['GET'])
 @member_login_required
 def books_borrowed():
     user_id = g.user_id
