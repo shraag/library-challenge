@@ -48,7 +48,7 @@ def login():
 
     access_token = create_access_token(identity=user.id, expires_delta=expires)
 
-    return jsonify({"access_token": access_token}), 200
+    return jsonify({"access_token": access_token, "user_role": user.role}), 200
 
 # Custom decorator for librarian access
 def librarian_login_required(fn):
