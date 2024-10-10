@@ -3,6 +3,7 @@ from modules.library.models.requests import SignUpRequest, BookRequest, UpdateMe
 from modules.library.models.models import UserRoles, Action, BookStatus, UserStatus
 from app import db
 from typing import List, Dict
+from datetime import datetime
 
 class LibraryRepository:
 
@@ -40,7 +41,8 @@ class LibraryRepository:
         Book.query.filter_by(id=book_id).update({
             'title': book_request.title,
             'author': book_request.author,
-            'published_year': book_request.published_year
+            'published_year': book_request.published_year,
+            'updated_at': datetime.now()
         })
         db.session.commit()
 
@@ -55,6 +57,7 @@ class LibraryRepository:
             User.query.filter_by(id=user_id).update({'last_name': user_request.last_name})
         if user_request.username:
             User.query.filter_by(id=user_id).update({'username': user_request.username})
+        User.query.filter_by(id=user_id).update({'updated_at': datetime.now()})
         db.session.commit()
 
     def get_member_history(self, member_id: str) -> List[Dict]:
