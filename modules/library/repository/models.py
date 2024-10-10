@@ -37,15 +37,6 @@ class Book(db.Model):
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
-class BorrowedBook(db.Model):
-    __tablename__ = 'borrowed_books'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
-    member_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    borrowed_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    return_date = db.Column(db.DateTime)
-
 class MemberHistory(db.Model):
     __tablename__ = 'member_history'
 

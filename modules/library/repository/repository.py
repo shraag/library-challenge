@@ -1,4 +1,4 @@
-from modules.library.repository.models import User, Book, BorrowedBook, MemberHistory
+from modules.library.repository.models import User, Book, MemberHistory
 from modules.library.models.requests import SignUpRequest, BookRequest, UpdateMemberRequest
 from modules.library.models.models import UserRoles, Action, BookStatus, UserStatus
 from app import db
@@ -49,6 +49,7 @@ class LibraryRepository:
     def delete_user(self, user_id: str) -> None:
         #soft delete
         User.query.filter_by(id=user_id).update({'status': UserStatus.DELETED.value})
+        db.session.commit()
 
     def update_user(self, user_id: str, user_request: UpdateMemberRequest) -> None:
         if user_request.first_name:

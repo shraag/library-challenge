@@ -1,6 +1,6 @@
 from modules.library.repository.repository import LibraryRepository
 from modules.library.models.requests import SignUpRequest, BookRequest, UpdateMemberRequest
-from modules.library.repository.models import User, Book, BorrowedBook, MemberHistory
+from modules.library.repository.models import User, Book, MemberHistory
 from typing import List, Dict
 
 library_repository = LibraryRepository()
