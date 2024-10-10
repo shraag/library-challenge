@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
@@ -68,6 +68,7 @@ def member_login_required(fn):
     @jwt_required()  # Require a valid JWT
     def decorator(*args, **kwargs):
         current_user_id = get_jwt_identity()  # Get user ID from the token
+        g.user_id = current_user_id
         current_user =  library_service.get_user_by_id(current_user_id)
 
         if not current_user or current_user.role != UserRoles.MEMBER.value:
@@ -165,3 +166,48 @@ def member_history():
 def view_members():
     members = library_service.get_members()
     return jsonify(members), 200
+
+# Member routes
+
+@library_bp.route('/available_books', methods=['GET'])
+@member_login_required
+def available_books():
+    books = library_service.get_available_books()
+    return jsonify(books), 200
+
+@library_bp.route('/borrow_book', methods=['POST'])
+@member_login_required
+def borrow_book():
+    data = request.get_json()
+    user_id = g.user_id
+    book_id = data.get('book_id')
+    if not book_id:
+        return jsonify({"error": "Book ID is required"}), 400
+    library_service.borrow_book(book_id, user_id)
+    return jsonify({"message": "Book borrowed successfully"}), 200
+
+@library_bp.route('/return_book', methods=['POST'])
+@member_login_required
+def return_book():
+    data = request.get_json()
+    user_id = g.user_id
+    book_id = data.get('book_id')
+    if not book_id:
+        return jsonify({"error": "Book ID is required"}), 400
+    library_service.return_book(book_id, user_id)
+    return jsonify({"message": "Book returned successfully"}), 200
+
+@library_bp.route('/delete_account', methods=['DELETE'])
+@member_login_required
+def delete_account():
+    user_id = g.user_id
+    library_service.delete_user(user_id)
+    # Logout the user
+    return jsonify({"message": "Account deleted successfully"}), 200
+
+@library_bp.route('/books_borrowed', methods=['get'])
+@member_login_required
+def books_borrowed():
+    user_id = g.user_id
+    history = library_service.get_borrowed_books(user_id)
+    return jsonify(history), 200
