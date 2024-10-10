@@ -308,3 +308,29 @@
 - **Error Responses:**
   - Code: 403
   - Content: `{"error": "Access forbidden: Member role required"}`
+
+
+### Hosting Instructions
+
+## PythonAnywhere Setup:
+
+1. Sign up an account on PythonAnywhere.
+2. Create a new web app and select the Flask framework.
+3. Clone your repository into the PythonAnywhere file system.
+4. Set up a virtual environment and install the required packages from `requirements.txt`.
+5. Configure the web app to point to your Flask application.
+
+## Environment Variables:
+
+Set up environment variables in the `.env` file. Ensure `SQLALCHEMY_DATABASE_URI`, `JWT_SECRET_KEY`, and other necessary variables are correctly set.
+
+## Database Migration:
+
+Run the following commands to set up the database:
+```sh
+flask db migrate
+flask db upgrade
+```
+
+## Running the Application:
+Start the web app from the PythonAnywhere dashboard. Ensure the application is running correctly by visiting the provided URL.
