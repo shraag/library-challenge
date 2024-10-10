@@ -89,5 +89,7 @@ class LibraryRepository:
 
     def get_borrowed_books(self, member_id: str) -> List[Dict]:
         borrowed_books = db.session.query(Book).join(MemberHistory, Book.id == MemberHistory.book_id) \
-            .filter(MemberHistory.member_id == member_id, MemberHistory.action == Action.BORROWED.value).all()
+            .filter(MemberHistory.member_id == member_id, 
+                    MemberHistory.action == Action.BORROWED.value,
+                    Book.status == BookStatus.BORROWED.value).all()
         return [book.to_dict() for book in borrowed_books]

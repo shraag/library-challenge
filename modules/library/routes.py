@@ -48,7 +48,7 @@ def login():
 
     access_token = create_access_token(identity=user.id, expires_delta=expires)
 
-    return jsonify({"access_token": access_token}), 200
+    return jsonify({"access_token": access_token, "user_role": user.role}), 200
 
 # Custom decorator for librarian access
 def librarian_login_required(fn):
@@ -203,6 +203,9 @@ def return_book():
 @member_login_required
 def delete_account():
     user_id = g.user_id
+    history = library_service.get_borrowed_books(user_id)
+    if history:
+        return jsonify({"error": "Return all books before deleting account"}), 400
     library_service.delete_user(user_id)
     # Logout the user
     return jsonify({"message": "Account deleted successfully"}), 200
