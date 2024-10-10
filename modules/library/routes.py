@@ -203,6 +203,9 @@ def return_book():
 @member_login_required
 def delete_account():
     user_id = g.user_id
+    history = library_service.get_borrowed_books(user_id)
+    if history:
+        return jsonify({"error": "Return all books before deleting account"}), 400
     library_service.delete_user(user_id)
     # Logout the user
     return jsonify({"message": "Account deleted successfully"}), 200
