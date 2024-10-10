@@ -42,20 +42,9 @@
 
 ### Database Diagram
 
-+-----------------+       +-----------------+       +---------------------+
-|     Users       |       |     Books       |       |   MemberHistory     |
-+-----------------+       +-----------------+       +---------------------+
-| id (PK)         |       | id (PK)         |       | id (PK)             |
-| first_name      |       | title           |       | member_id (FK)      |
-| last_name       |       | author          |       | book_id (FK)        |
-| username (U)    |       | published_year  |       | action              |
-| password_hash   |       | status          |       | action_date         |
-| role            |       | created_at      |       +---------------------+
-| status          |       | updated_at      |
-| created_at      |       +-----------------+
-| updated_at      |
-+-----------------+
+This diagram shows the relationships between the tables in the library system:
 
+<iframe width="560" height="315" src='https://dbdiagram.io/e/67083c1d97a66db9a3973e73/67083c2897a66db9a3973f32'> </iframe>
 
 ### API Documentation
 
