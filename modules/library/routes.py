@@ -9,14 +9,16 @@ from functools import wraps
 from config import Config
 
 
-library_bp = Blueprint('library', __name__)
+auth_bp = Blueprint('auth', __name__)
+librarian_bp = Blueprint('librarian', __name__)
+member_bp = Blueprint('member', __name__)
 
 library_service = LibraryService()
 
 # Set the expiration time for the token
 expires = timedelta(minutes=int(Config.JWT_EXPIRATION_MINUTES))
 
-@library_bp.route('/signup', methods=['POST'])
+@auth_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     user_request = SignUpRequest(**data)
@@ -30,7 +32,7 @@ def signup():
 
     return jsonify({"message": "User created successfully"}), 201
 
-@library_bp.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
 
@@ -79,13 +81,13 @@ def member_login_required(fn):
 
 # Librarian routes
 
-@library_bp.route('/books', methods=['GET'])
-@librarian_login_required()
+@librarian_bp.route('/books', methods=['GET'])
+@librarian_login_required
 def get_books():
     books = library_service.get_books()
     return jsonify(books), 200
 
-@library_bp.route('/add_book', methods=['POST'])
+@librarian_bp.route('/add_book', methods=['POST'])
 @librarian_login_required
 def add_book():
     data = request.get_json()
@@ -96,7 +98,7 @@ def add_book():
 
     return jsonify({"message": "Book added successfully"}), 201
 
-@library_bp.route('/delete_book', methods=['DELETE'])
+@librarian_bp.route('/delete_book', methods=['DELETE'])
 @librarian_login_required
 def delete_book():
     book_id = request.get_json().get('book_id')
@@ -105,7 +107,7 @@ def delete_book():
     library_service.delete_book(book_id)
     return jsonify({"message": "Book deleted successfully"}), 200
 
-@library_bp.route('/update_book', methods=['PUT'])
+@librarian_bp.route('/update_book', methods=['PUT'])
 @librarian_login_required
 def update_book():
     data = request.get_json()
@@ -116,7 +118,7 @@ def update_book():
     library_service.update_book(book_id, book_request)
     return jsonify({"message": "Book updated successfully"}), 200
 
-@library_bp.route('/add_member', methods=['POST'])
+@librarian_bp.route('/add_member', methods=['POST'])
 @librarian_login_required
 def add_member():
     data = request.get_json()
@@ -132,7 +134,7 @@ def add_member():
     return jsonify({"message": "Member created successfully"}), 201
 
 #Soft Delete
-@library_bp.route('/delete_member', methods=['DELETE'])
+@librarian_bp.route('/delete_member', methods=['DELETE'])
 @librarian_login_required
 def delete_member():
     member_id = request.get_json().get('member_id')
@@ -141,18 +143,18 @@ def delete_member():
     library_service.delete_user(member_id)
     return jsonify({"message": "Member deleted successfully"}), 200
 
-@library_bp.route('/update_member', methods=['PUT'])
+@librarian_bp.route('/update_member', methods=['PUT'])
 @librarian_login_required
 def update_member():
     data = request.get_json()
     member_id = data.get('member_id')
     if not member_id:
         return jsonify({"error": "Member ID is required"}), 400
-    user_request = (UpdateMemberRequest**data)
+    user_request = UpdateMemberRequest(**data)
     library_service.update_user(member_id, user_request)
     return jsonify({"message": "Member updated successfully"}), 200
 
-@library_bp.route('/member_history', methods=['GET'])
+@librarian_bp.route('/member_history', methods=['GET'])
 @librarian_login_required
 def member_history():
     member_id = request.args.get('member_id')
@@ -161,7 +163,7 @@ def member_history():
     history = library_service.get_member_history(member_id)
     return jsonify(history), 200
 
-@library_bp.route('/view_members', methods=['POST'])
+@librarian_bp.route('/view_members', methods=['GET'])
 @librarian_login_required
 def view_members():
     members = library_service.get_members()
@@ -169,13 +171,13 @@ def view_members():
 
 # Member routes
 
-@library_bp.route('/available_books', methods=['GET'])
+@member_bp.route('/available_books', methods=['GET'])
 @member_login_required
 def available_books():
     books = library_service.get_available_books()
     return jsonify(books), 200
 
-@library_bp.route('/borrow_book', methods=['POST'])
+@member_bp.route('/borrow_book', methods=['POST'])
 @member_login_required
 def borrow_book():
     data = request.get_json()
@@ -186,7 +188,7 @@ def borrow_book():
     library_service.borrow_book(book_id, user_id)
     return jsonify({"message": "Book borrowed successfully"}), 200
 
-@library_bp.route('/return_book', methods=['POST'])
+@member_bp.route('/return_book', methods=['POST'])
 @member_login_required
 def return_book():
     data = request.get_json()
@@ -197,7 +199,7 @@ def return_book():
     library_service.return_book(book_id, user_id)
     return jsonify({"message": "Book returned successfully"}), 200
 
-@library_bp.route('/delete_account', methods=['DELETE'])
+@member_bp.route('/delete_account', methods=['DELETE'])
 @member_login_required
 def delete_account():
     user_id = g.user_id
@@ -205,7 +207,7 @@ def delete_account():
     # Logout the user
     return jsonify({"message": "Account deleted successfully"}), 200
 
-@library_bp.route('/books_borrowed', methods=['get'])
+@member_bp.route('/books_borrowed', methods=['get'])
 @member_login_required
 def books_borrowed():
     user_id = g.user_id
