@@ -44,7 +44,7 @@
 
 This diagram shows the relationships between the tables in the library system:
 
-![Database Diagram](https://dbdiagram.io/e/67083c1d97a66db9a3973e73/67083c2897a66db9a3973f32)
+https://dbdiagram.io/e/67083c1d97a66db9a3973e73/67083c2897a66db9a3973f32
 
 ### API Documentation
 
