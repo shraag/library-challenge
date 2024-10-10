@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
 from flask_jwt_extended import JWTManager
-
+from flask_cors import CORS
 
 app = Flask(__name__)
 
 # Load configurations
 app.config.from_object(Config)
+
+CORS(app)  # Enable Cross-Origin Resource Sharing
 
 # Initialize extensions
 db = SQLAlchemy(app)
@@ -40,6 +42,6 @@ def not_found(error):
 def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
 
-# Run the application
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True)
